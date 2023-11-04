@@ -1,5 +1,14 @@
 # 1 - Write an #insert and #delete method which accepts a value to insert/delete. 
 ## You’ll have to deal with several cases for delete, such as when a node has children or not.
+# 2 - Write a #level_order method which accepts a block. 
+## This method should traverse the tree in breadth-first level order and yield each node to the provided block.
+# 3 - Write #inorder, #preorder, and #postorder methods that accepts a block
+## The methods should return an array of values if no block is given.
+# 4 - Write a #height method that accepts a node and returns its height.
+# 5 - Write a #depth method that accepts a node and returns its depth.
+# 6 - Write a #balanced? method that checks if the tree is balanced.
+# 7 - Write a #rebalance method which rebalances an unbalanced tree. 
+## You’ll want to use a traversal method to provide a new array to the #build_tree method.
 
 class Tree
   attr_reader :root

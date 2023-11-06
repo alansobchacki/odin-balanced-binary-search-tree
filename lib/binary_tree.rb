@@ -1,7 +1,5 @@
 # 1 - Write an #insert and #delete method which accepts a value to insert/delete. 
 ## You’ll have to deal with several cases for delete, such as when a node has children or not.
-# 2 - Write a #level_order method which accepts a block. 
-## This method should traverse the tree in breadth-first level order and yield each node to the provided block.
 # 3 - Write #inorder, #preorder, and #postorder methods that accepts a block
 ## The methods should return an array of values if no block is given.
 # 4 - Write a #height method that accepts a node and returns its height.
@@ -28,21 +26,28 @@ class Tree
     root_node
   end
   
-  def find(value)
+  def level_order(data)
     queue = []
     queue.push(@root)
 
     while(!queue.empty?)
       current = queue.shift
 
-      if current.data == value then
-        puts "The value of #{value} is present in the node #{current}."
+      if current.data == data then
+        puts "The node #{current} is present and holds the value of #{current.data}"
         return
       end
 
       queue.push(current.left) if (current.left)
       queue.push(current.right) if (current.right) 
     end
+  end
+
+  def find(value, node = root)
+    return puts "The node #{node} is present and has a value of #{node.data}" if node.nil? || node.data == value
+
+    find(value, node.left) if value < node.data
+    find(value, node.right) if value > node.data
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
@@ -67,7 +72,8 @@ end
 def main
   binary_tree = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
   binary_tree.pretty_print
-  binary_tree.find(324)
+  binary_tree.level_order(324)
+  binary_tree.find(9)
 end
 
 main

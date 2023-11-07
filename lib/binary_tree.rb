@@ -1,7 +1,5 @@
 # 1 - Write an #insert and #delete method which accepts a value to insert/delete. 
 ## You’ll have to deal with several cases for delete, such as when a node has children or not.
-# 3 - Write #inorder, #preorder, and #postorder methods that accepts a block
-## The methods should return an array of values if no block is given.
 # 5 - Write a #depth method that accepts a node and returns its depth.
 # 6 - Write a #balanced? method that checks if the tree is balanced.
 # 7 - Write a #rebalance method which rebalances an unbalanced tree. 
@@ -25,25 +23,44 @@ class Tree
     root_node
   end
   
-  def level_order(data)
+  def level_order
     queue = []
     queue.push(@root)
 
     while(!queue.empty?)
       current = queue.shift
-
-      if current.data == data then
-        puts "The node #{current} is present and holds the value of #{current.data}."
-        return
-      end
-
+      print "#{current.data} "
       queue.push(current.left) if (current.left)
       queue.push(current.right) if (current.right) 
     end
   end
+  
+  def inorder(node = @root)
+    return if node.nil?
+
+    inorder(node.left)
+    print "#{node.data} "
+    inorder(node.right)
+  end
+
+  def preorder(node = @root)
+    return if node.nil?
+    
+    print "#{node.data} "
+    preorder(node.left)
+    preorder(node.right)
+  end
+
+  def postorder(node = @root)
+    return if node.nil?
+
+    postorder(node.left)
+    postorder(node.right)
+    print "#{node.data} "
+  end
 
   def find(value, node = @root)
-    return p node if node.nil? || node.data == value
+    return puts "The value of #{value} is present in #{node}." if node.nil? || node.data == value
 
     find(value, node.left) if value < node.data
     find(value, node.right) if value > node.data
@@ -51,18 +68,22 @@ class Tree
 
   def height(value, node_height = 0, node = @root)
     return puts "The node #{value} isn't present in this tree." if node.nil? 
-    return puts "The height of the node #{node.data} is #{node_height}." if node.data == value
+    return puts "The height of node #{node.data} is #{node_height}." if node.data == value
     
     height(value, node_height += 1, node.left) if value < node.data
     height(value, node_height += 1, node.right) if value > node.data
   end
 
-  def learning(node = @root)
-    
-    return if node.left.nil?
-
-    puts node.left
-    learning(node.left)
+  def pretty_order
+    puts 'Binary Search Tree Traversals:' ; puts ''
+    puts '┌─ Level order '
+    level_order ; puts ''
+    puts '┌─ Inorder'
+    inorder ; puts '' 
+    puts '┌─ Preorder'
+    preorder ; puts ''
+    puts '┌─ Postorder'
+    postorder ; puts '' ; puts ''
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
@@ -88,9 +109,9 @@ def main
   binary_tree = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
   # binary_tree = Tree.new(Array.new(15) { rand(1..100) })
   binary_tree.pretty_print
-  binary_tree.level_order(324)
-  binary_tree.find(9)
-  binary_tree.height(9)
+  binary_tree.find(7)
+  binary_tree.height(6345)
+  binary_tree.pretty_order
 end
 
 main

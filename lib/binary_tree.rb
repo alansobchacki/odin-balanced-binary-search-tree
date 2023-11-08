@@ -1,6 +1,3 @@
-# 1 - Write an #insert and #delete method which accepts a value to insert/delete. 
-## You’ll have to deal with several cases for delete, such as when a node has children or not.
-# 6 - Write a #balanced? method that checks if the tree is balanced.
 # 7 - Write a #rebalance method which rebalances an unbalanced tree. 
 ## You’ll want to use a traversal method to provide a new array to the #build_tree method.
 
@@ -22,6 +19,55 @@ class Tree
     root_node
   end
   
+  # Below are our methods for inserting / deleting nodes in our tree
+
+  def insert(value, node = @root)
+    return if node.nil? || node.data == value
+
+    if value > node.data
+    insert(value, node.right)
+      node.right.nil? ? node.right = Node.new(value) : insert(value, node.right)
+    else
+    insert(value, node.left)
+      node.left.nil? ? node.left = Node.new(value) : insert(value, node.left)
+    end
+  end
+
+  # used to insert multiple nodes after a tree is built, as part of the assignment
+  def insert_nodes
+    rand(2..10).times do
+      insert(rand(100..199))
+    end
+  end
+
+  def delete(value, node = @root)
+    return node if node.nil?
+
+    if value < node.data
+      node.left = delete(value, node.left)
+    elsif value > node.data
+      node.right = delete(value, node.right)
+    else
+      
+      return node.right if node.left.nil?
+      return node.left if node.right.nil?
+
+      leftmost_node = leftmost_leaf(node.right)
+      node.data = leftmost_node.data
+      node.right = delete(leftmost_node.data, node.right)
+    end
+    node
+  end
+
+  def leftmost_leaf(node)
+    node = node.left until node.left.nil?
+
+    node
+  end
+
+  # Below are our traversal methods
+  # 'sleep' values are used for cosmetic reasons
+
   def level_order
     queue = []
     queue.push(@root)
@@ -29,23 +75,29 @@ class Tree
     while(!queue.empty?)
       current = queue.shift
       print "#{current.data} "
+      sleep 0.2 
       queue.push(current.left) if (current.left)
       queue.push(current.right) if (current.right) 
     end
   end
   
-  def inorder(node = @root)
+  # We build an array with the results to use in our 'balanced?' method
+  def inorder(node = @root, inorder_array = [])
     return if node.nil?
 
-    inorder(node.left)
-    print "#{node.data} "
-    inorder(node.right)
+    inorder(node.left, inorder_array)
+    print "#{node.data} " 
+    sleep 0.2 
+    inorder_array.push(node.data)
+    inorder(node.right, inorder_array)
+    @inorder_array = inorder_array
   end
 
   def preorder(node = @root)
     return if node.nil?
     
     print "#{node.data} "
+    sleep 0.2 
     preorder(node.left)
     preorder(node.right)
   end
@@ -56,7 +108,10 @@ class Tree
     postorder(node.left)
     postorder(node.right)
     print "#{node.data} "
+    sleep 0.2 
   end
+
+  # Below are our methods that iterate over nodes and give us the requested data
 
   def find(value, node = @root)
     return puts "The value of #{value} is present in #{node}." if node.nil? || node.data == value
@@ -78,22 +133,35 @@ class Tree
 
     left_height = find_height(value, node.left)
     right_height = find_height(value, node.right)
-    ans = [left_height, right_height].max + 1
+    average_height = [left_height, right_height].max + 1
 
-    @node_height = ans if node.data == value
+    @node_height = average_height if node.data == value
 
-    ans
+    average_height
   end
 
   def height(value)
     @node_height = nil
     find_height(value, @root)
     @node_height
-    puts "The node with value of #{value} has a height of #{@node_height}."
+    puts "The height of node #{value} is #{@node_height}."
   end
 
+  # We perform an in-order traversal on our tree and store these values into a temp array.
+  # If this array ends up with sorted ascending values, we have a balanced BST.
+  # We use our 'inorder' method to push the BST values into a temp array,
+  # and compare it to the original sorted array we use to build our BST.
+  # This way, we can find out if our BST is balanced without having to write new code.
+  def balanced?()
+    puts @inorder_array == @array ? 'This tree is balanced.' : 'This tree is not balanced.'
+  end
+
+  # Below are our methods to make our inputs look good on the terminal
+
   def pretty_order
-    puts 'Binary Search Tree Traversals:' ; puts ''
+    puts 'Binary Search Tree Builder Started.' ; sleep 2
+    puts "Building a BST out of the following array: #{@array}" ; sleep 2
+    puts 'Building Binary Search Tree Traversals...' ; puts ''
     puts '┌─ Level order '
     level_order ; puts ''
     puts '┌─ Inorder'
@@ -101,11 +169,14 @@ class Tree
     puts '┌─ Preorder'
     preorder ; puts ''
     puts '┌─ Postorder'
-    postorder ; puts '' ; puts ''
+    postorder ; puts ''
+    puts 'Binary Search Tree Traversals Complete!'
+    puts 'Building our BST...' ; puts ''
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
+    sleep 0.5
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
@@ -124,13 +195,13 @@ end
 ####
 
 def main
-  binary_tree = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-  # binary_tree = Tree.new(Array.new(15) { rand(1..100) })
-  binary_tree.pretty_print
-  binary_tree.find(7)
-  binary_tree.depth(6345)
-  binary_tree.height(7)
+  binary_tree = Tree.new(Array.new(15) { rand(1..100) })
   binary_tree.pretty_order
+  binary_tree.pretty_print
+  binary_tree.balanced?
+  binary_tree.insert_nodes
+  binary_tree.pretty_print
+  binary_tree.balanced?
 end
 
 main
